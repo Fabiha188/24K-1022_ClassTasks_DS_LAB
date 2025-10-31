@@ -31,6 +31,7 @@ class Tour{
     node* insert(string nn,node* head){
         if(head==nullptr){
             head=new node(nn);
+            return head;
         }
          if(nn> head->name){
             head->right=insert(nn,head->right);
