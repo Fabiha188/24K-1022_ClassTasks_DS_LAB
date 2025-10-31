@@ -1,110 +1,96 @@
 #include <iostream>
-#include <string>
 using namespace std;
 
-struct Student {
-    string name;
-    int score;
-    Student* next;
-    Student(string n, int s) : name(n), score(s), next(nullptr) {}
+struct Node {
+    int data;
+    Node* next;
 };
 
-void addStudent(Student*& head, string name, int score) {
-    Student* newStudent = new Student(name, score);
-    if (!head)
-        head = newStudent;
-    else {
-        Student* current = head;
-        while (current->next)
-            current = current->next;
-        current->next = newStudent;
-    }
+Node* newNode(int val) {
+    Node* temp = new Node;
+    temp->data = val;
+    temp->next = nullptr;
+    return temp;
 }
 
-int findMaxScore(Student* head) {
-    int highest = 0;
+void append(Node*& head, int val) {
+    if (!head) {
+        head = newNode(val);
+        return;
+    }
+    Node* curr = head;
+    while (curr->next)
+        curr = curr->next;
+    curr->next = newNode(val);
+}
+
+void printList(Node* head) {
     while (head) {
-        if (head->score > highest)
-            highest = head->score;
+        cout << head->data << " ";
         head = head->next;
     }
-    return highest;
+    cout << endl;
 }
 
-int extractDigit(int number, int place) {
-    return (number / place) % 10;
+Node* getTail(Node* head) {
+    while (head && head->next)
+        head = head->next;
+    return head;
 }
 
-Student* distributeToBuckets(Student* head, int place) {
-    Student* bucketHead[10] = {nullptr};
-    Student* bucketTail[10] = {nullptr};
-
-    Student* current = head;
-    while (current) {
-        int digit = extractDigit(current->score, place);
-        Student* nextNode = current->next;
-        current->next = nullptr;
-
-        if (!bucketHead[digit])
-            bucketHead[digit] = bucketTail[digit] = current;
-        else {
-            bucketTail[digit]->next = current;
-            bucketTail[digit] = current;
-        }
-        current = nextNode;
-    }
-
-    Student* newHead = nullptr;
-    Student* newTail = nullptr;
-
-    for (int i = 0; i < 10; i++) {
-        if (bucketHead[i]) {
-            if (!newHead)
-                newHead = bucketHead[i];
-            else
-                newTail->next = bucketHead[i];
-            newTail = bucketTail[i];
+Node* partition(Node* head, Node* end, Node** newHead, Node** newEnd) {
+    Node* pivot = end;
+    Node *prev = nullptr, *curr = head, *tail = pivot;
+    while (curr != pivot) {
+        if (curr->data < pivot->data) {
+            if (!(*newHead))
+                *newHead = curr;
+            prev = curr;
+            curr = curr->next;
+        } else {
+            if (prev)
+                prev->next = curr->next;
+            Node* tmp = curr->next;
+            curr->next = nullptr;
+            tail->next = curr;
+            tail = curr;
+            curr = tmp;
         }
     }
+    if (!(*newHead))
+        *newHead = pivot;
+    *newEnd = tail;
+    return pivot;
+}
+
+Node* quickSortRec(Node* head, Node* end) {
+    if (!head || head == end)
+        return head;
+    Node *newHead = nullptr, *newEnd = nullptr;
+    Node* pivot = partition(head, end, &newHead, &newEnd);
+    if (newHead != pivot) {
+        Node* tmp = newHead;
+        while (tmp->next != pivot)
+            tmp = tmp->next;
+        tmp->next = nullptr;
+        newHead = quickSortRec(newHead, tmp);
+        tmp = getTail(newHead);
+        tmp->next = pivot;
+    }
+    pivot->next = quickSortRec(pivot->next, newEnd);
     return newHead;
 }
 
-void radixSort(Student*& head) {
-    int maxScore = findMaxScore(head);
-    for (int place = 1; maxScore / place > 0; place *= 10)
-        head = distributeToBuckets(head, place);
-}
-
-void printStudents(Student* head) {
-    cout << "\nSorted Student List:\n";
-    cout << "--------------------------\n";
-    cout << "Name\tScore\n";
-    cout << "--------------------------\n";
-    while (head) {
-        cout << head->name << "\t" << head->score << "\n";
-        head = head->next;
-    }
+void quickSort(Node** headRef) {
+    *headRef = quickSortRec(*headRef, getTail(*headRef));
 }
 
 int main() {
-    Student* head = nullptr;
-    int totalStudents;
-    cout << "Enter number of students: ";
-    cin >> totalStudents;
-
-    for (int i = 0; i < totalStudents; i++) {
-        string name;
-        int score;
-        cout << "Enter name of student " << i + 1 << ": ";
-        cin >> name;
-        cout << "Enter score (0–100): ";
-        cin >> score;
-        addStudent(head, name, score);
-    }
-
-    cout << "\nSorting students by score using Radix Sort...\n";
-    radixSort(head);
-    printStudents(head);
-
+    Node* head = nullptr;
+    int values[] = {10, 7, 8, 9, 1, 5, 3};
+    for (int val : values)
+        append(head, val);
+    quickSort(&head);
+    printList(head);
     return 0;
 }
