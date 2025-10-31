@@ -31,6 +31,7 @@ class DataAnalysyt{
     node* insert(string nn,node* head){
         if(head==nullptr){
             head=new node(nn);
+            return head;
         }
          if(nn> head->name){
             head->right=insert(nn,head->right);
@@ -66,7 +67,7 @@ class DataAnalysyt{
     }
     int height(node* head){
         if(head==nullptr){
-            return 0;
+            return -1;
         }
         int leftHeight=height(head->left);
         int rightHeight=height(head->right);
@@ -75,7 +76,7 @@ class DataAnalysyt{
 };
 int main(){
     DataAnalysyt d;
-    string names[] = {"Ahmed", "Fatima", "Hassan", "Aisha", "Omar", "Zainab", "Yusuf"};
+    string names[] = { "Fatima", "Hassan", "Aisha", "Omar", "Zainab", "Yusuf"};
     for (string name : names) {
         d.head = d.insert(name, d.head);
     }
