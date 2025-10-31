@@ -84,8 +84,8 @@ int main(){
     d.inOrder(d.head);
     cout << endl;
 
-    cout << "Total nodes: " << d.countNodes(d.head) << endl;
-    cout << "Leaf nodes: " << d.countLeaves(d.head) << endl;
+    cout << "Total nodes: " << d.countNode(d.head) << endl;
+    cout << "Leaf nodes: " << d.countLeave(d.head) << endl;
     cout << "Height of tree: " << d.height(d.head) << endl;
 
     return 0;
